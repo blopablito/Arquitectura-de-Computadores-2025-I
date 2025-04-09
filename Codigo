@@ -1,81 +1,75 @@
 #include <iostream>
 using namespace std;
 
-// Función para mostrar un entero como binario (n bits)
-void printBinary(int value, int bits) {
+void mostrarBinario(int valor, int bits) {
     for (int i = bits - 1; i >= 0; --i) {
-        cout << ((value >> i) & 1);
+        cout << ((valor >> i) & 1);
     }
 }
 
-// Algoritmo de Booth
-void boothAlgorithm(int M, int Q, int n) {
+void Algoritmo(int M, int Q, int n) {
     int A = 0;
     int Q_1 = 0;
-    int count = n;
+    int contador = n;
 
-    // Enmascarar valores para que se mantengan en n bits
-    int mask = (1 << n) - 1;
-    
-    // Asegurar M está en complemento a dos si es negativo
+    int mascara = (1 << n) - 1;
+
     if (M < 0) M = (1 << n) + M;
     if (Q < 0) Q = (1 << n) + Q;
 
-    int negM = (~M + 1) & mask;
+    int negativoDeM = (~M + 1) & mascara;
 
-    cout << "Inicialización:\n";
-    cout << "A: "; printBinary(A, n);
-    cout << "  Q: "; printBinary(Q, n);
+    cout << "Estado inicial:\n";
+    cout << "A: "; mostrarBinario(A, n);
+    cout << "  Q: "; mostrarBinario(Q, n);
     cout << "  Q-1: " << Q_1 << "\n\n";
 
-    while (count-- > 0) {
+    while (contador-- > 0) {
         int Q0 = Q & 1;
-        int bits = (Q0 << 1) | Q_1;
+        int combinacion = (Q0 << 1) | Q_1;
 
-        if (bits == 0b10) {
-            A = (A + negM) & mask;
+        if (combinacion == 0b10) {
+            A = (A + negativoDeM) & mascara;
             cout << "A <- A - M\n";
-        } else if (bits == 0b01) {
-            A = (A + M) & mask;
+        } else if (combinacion == 0b01) {
+            A = (A + M) & mascara;
             cout << "A <- A + M\n";
         } else {
-            cout << "No operación\n";
+            cout << "Sin operación\n";
         }
 
-        // Shift aritmético: combinar A y Q, luego desplazar
-        int combined = (A << (n + 1)) | (Q << 1) | Q_1;
-        combined = combined >> 1; // desplazamiento aritmético por ser int (signo se conserva)
+        int combinado = (A << (n + 1)) | (Q << 1) | Q_1;
+        combinado = combinado >> 1;
 
-        // Extraer nuevos valores
-        Q_1 = combined & 1;
-        Q = (combined >> 1) & mask;
-        A = (combined >> (n + 1)) & mask;
+        Q_1 = combinado & 1;
+        Q = (combinado >> 1) & mascara;
+        A = (combinado >> (n + 1)) & mascara;
 
-        cout << "A: "; printBinary(A, n);
-        cout << "  Q: "; printBinary(Q, n);
-        cout << "  Q-1: " << Q_1 << "  Count: " << count << "\n\n";
+        cout << "A: "; mostrarBinario(A, n);
+        cout << "  Q: "; mostrarBinario(Q, n);
+        cout << "  Q-1: " << Q_1 << "  Contador: " << contador << "\n\n";
     }
 
-    int result = (A << n) | Q;
+    int resultado = (A << n) | Q;
 
-    // Signo: ajustar resultado si es negativo (bit más significativo en 1)
-    if ((result >> (2 * n - 1)) & 1) {
-        result |= ~((1 << (2 * n)) - 1); // signo extendido
+    if ((resultado >> (2 * n - 1)) & 1) {
+        resultado |= ~((1 << (2 * n)) - 1);
     }
 
     cout << "Resultado final en binario: ";
-    printBinary(result, 2 * n);
-    cout << "\nResultado final en decimal: " << result << "\n";
+    mostrarBinario(resultado, 2 * n);
+    cout << "\nResultado final en decimal: " << resultado << "\n";
 }
+
 int main() {
     int M, Q, n;
-    cout << "Multiplicando (M): ";
+    cout << "Ingresa el multiplicando (M): ";
     cin >> M;
-    cout << "Multiplicador (Q): ";
+    cout << "Ingresa el multiplicador (Q): ";
     cin >> Q;
-    cout << "Número de bits (n): ";
+    cout << "Cantidad de bits (n): ";
     cin >> n;
 
-    boothAlgorithm(M, Q, n);
+    Algoritmo(M, Q, n);
     return 0;
 }
